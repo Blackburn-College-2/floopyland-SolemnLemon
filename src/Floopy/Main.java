@@ -3,7 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package emptyjavaproject;
+package Floopy;
+
+import com.pauliankline.floopyconnector.Floopy;
 
 /**
  *
@@ -16,6 +18,10 @@ public class Main {
      */
     public static void main(String[] args) {
         // TODO code application logic here
+        Floopy floop = new Floopy(new Game()); 
+
+floop.begin(2);
+        
     }
     
 }
