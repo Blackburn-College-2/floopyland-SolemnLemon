@@ -18,10 +18,10 @@ public class Main {
      */
     public static void main(String[] args) {
         // TODO code application logic here
-        Floopy floop = new Floopy(new Game()); 
+        Floopy floop = new Floopy(new Game());
 
-floop.begin(2);
-        
+        floop.begin(2);
+
     }
-    
+
 }

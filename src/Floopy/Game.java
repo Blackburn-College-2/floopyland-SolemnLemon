@@ -12,18 +12,19 @@ import java.awt.Point;
 import java.util.ArrayList;
 
 /**
- *subclass controller
+ * subclass controller
+ *
  * @author sunbe
  */
 public class Game extends GameController {
 
-    
     GameBoard board;
-    public Game(){
-    board=mkGameBoard();
-    
-    createHeroes(getBoard(),2);
-    
+
+    public Game() {
+        board = mkGameBoard();
+
+        createHeroes(getBoard(), 2);
+
     }
 
     public GameBoard getBoard() {
@@ -33,10 +34,10 @@ public class Game extends GameController {
     public void setBoard(GameBoard board) {
         this.board = board;
     }
-    
+
     /**
-     * creates game board used in the game
-     * and adds items (not done yet)
+     * creates game board used in the game and adds items (not done yet)
+     *
      * @return
      */
     @Override
@@ -46,7 +47,8 @@ public class Game extends GameController {
     }
 
     /**
-     * populates a board for the game with heroes storing each hero's location in their own location property.
+     * populates a board for the game with heroes storing each hero's location
+     * in their own location property.
      *
      * @param board board to be populated
      * @param amount amount of heroes
@@ -54,10 +56,10 @@ public class Game extends GameController {
      */
     @Override
     public ArrayList<BaseHero> createHeroes(GameBoard board, int amount) {
-ArrayList<BaseHero> heroes = new ArrayList();
-heroes.add(new Hero("Magnet Man",getBoard(), new Point(1,1)));
+        ArrayList<BaseHero> heroes = new ArrayList();
+        heroes.add(new Hero("Magnet Man", getBoard(), new Point(1, 1)));
 
-heroes.add(new Hero("Magnet Woman",getBoard(), new Point(1,2)));
-        return null;
+        heroes.add(new Hero("Magnet Woman", getBoard(), new Point(1, 2)));
+        return heroes;
     }
 }

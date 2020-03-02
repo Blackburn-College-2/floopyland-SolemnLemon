@@ -30,10 +30,15 @@ public class Hero extends BaseHero {
     int baseAr;
 
     public Hero(String name, GameBoard gameBoard, Point position) {
+        
         super(gameBoard, position);
+        System.out.println("test");
         this.name = name;
         baseAr = 10;
         getBoard().getGameSquare(getLocation()).addHero(this);
+        
+        setHp(100);
+        super.color="red";
     }
 
     /**
@@ -62,6 +67,7 @@ public class Hero extends BaseHero {
      */
     @Override
     public void die() {
+ 
         this.location.setLocation(null);
         setLiving(false);
 
@@ -75,11 +81,14 @@ public class Hero extends BaseHero {
     @Override
     public void gameTickAction(long gameTick) {
         if (!isInBattle()) {
-if(getBoard().getGameSquare(getLocation()).hasItems()){
+            if (getBoard().getGameSquare(getLocation()).hasItems()) {
+                pickUp(getBoard().getGameSquare(getLocation()).getItems().get(0));
+            } else {
+                move();
+            }
 
-
-}
         }
+
     }
 
     /**
@@ -89,23 +98,59 @@ if(getBoard().getGameSquare(getLocation()).hasItems()){
     public void move() {
 
         location = chooseRandomDirection();
-        getBoard().getGameSquare(location).addHero(this);
-
+        getBoard().getGameSquare(getLocation()).addHero(this);
+//checks square for items then adds them if their are any
         if (getBoard().getGameSquare(location).hasItems()) {
             pickUp(getBoard().getGameSquare(getLocation()).getItems().get(0));
+            getBoard().getGameSquare(getLocation()).getItems().remove(0);
+
         }
+    }
+
+    public ArrayList<Hero> scan() {
+        //good lord this is going to be hellish
+        ArrayList<Hero> enemys = new ArrayList();
+
+        return enemys;
+    }
+/**
+ * checks a square if it has an enemy in it and returns it
+ * also manages wrapping
+ * @param x x value of square
+ * @param y value of square
+ * @return hero in the square
+ */
+    public BaseHero checkSquare(int x, int y) {
+        if (getBoard().getGameSquare(new Point(xWrap(x), yWrap(y))).heroesArePresent()) {
+            return getBoard().getGameSquare(new Point(xWrap(x), yWrap(y))).getHeroesPresent().get(0);
+        }
+        return null;
+    }
+
+    public int yWrap(int y) {
+        if (y < 0) {
+            y = getBoard().getHeight() - 1;
+        }
+        return y % getBoard().getHeight();
+    }
+
+    public int xWrap(int x) {
+        if (x < 0) {
+            x = getBoard().getHeight() - 1;
+        }
+        return x % getBoard().getHeight();
     }
 
     /**
      * checks if inventory has space for an item and if it does it adds it to
-     * it. then removes it from the game board at that point
+     * it.
      *
      * @param item
      */
     public void pickUp(Item item) {
         if (inventory.size() < inventorySize) {
             inventory.add(item);
-            getBoard().getGameSquare(getLocation()).getItems().remove(0);
+
         }
     }
 
@@ -147,6 +192,7 @@ if(getBoard().getGameSquare(getLocation()).hasItems()){
      */
     @Override
     public String enemy() {
+       
         return null;
     }
 
