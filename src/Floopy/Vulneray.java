@@ -15,6 +15,7 @@ public class Vulneray extends ItemStuff {
     public Vulneray() {
         super("Health Potion");
         setUses(4);
+        super.color="green";
 
     }
     

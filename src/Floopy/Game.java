@@ -8,7 +8,6 @@ package Floopy;
 import com.pauliankline.floopyconnector.BaseHero;
 import com.pauliankline.floopyconnector.GameBoard;
 import com.pauliankline.floopyconnector.GameController;
-import com.pauliankline.floopyconnector.Item;
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Random;
@@ -20,7 +19,7 @@ import java.util.Random;
  */
 public class Game extends GameController {
 
-    Random random = new Random();
+    public Random random = new Random();
 
     /**
      * creates game board used in the game and adds items (not done yet)
@@ -29,10 +28,21 @@ public class Game extends GameController {
      */
     @Override
     public GameBoard mkGameBoard() {
-        GameBoard board =new GameBoard(10, 10);
+        GameBoard gboard =new GameBoard(10, 10);
+        
 ItemStuff hp =new Vulneray();
-board.getGameSquare(new Point(1,1)).addItem(hp);
-        return board;
+ItemStuff hp2 =new Vulneray();
+gboard.getGameSquare(new Point(((int)(Math.random()*gboard.getWidth())), (((int)(Math.random()*gboard.getHeight()))))).addItem(hp);
+gboard.getGameSquare(new Point(((int)(Math.random()*gboard.getWidth())), (((int)(Math.random()*gboard.getHeight()))))).addItem(hp2);
+ItemStuff str =new StrengthPotion();
+ItemStuff str2 =new StrengthPotion();
+gboard.getGameSquare(new Point(((int)(Math.random()*gboard.getWidth())), (((int)(Math.random()*gboard.getHeight()))))).addItem(str);
+gboard.getGameSquare(new Point(((int)(Math.random()*gboard.getWidth())), (((int)(Math.random()*gboard.getHeight()))))).addItem(str2);
+ItemStuff tome=new Tome();
+gboard.getGameSquare(new Point(((int)(Math.random()*gboard.getWidth())), (((int)(Math.random()*gboard.getHeight()))))).addItem(tome);
+ItemStuff peace=new PeaceTreaty();
+gboard.getGameSquare(new Point(((int)(Math.random()*gboard.getWidth())), (((int)(Math.random()*gboard.getHeight()))))).addItem(peace);
+        return gboard;
     }
 
     /**
@@ -48,7 +58,7 @@ board.getGameSquare(new Point(1,1)).addItem(hp);
         ArrayList<BaseHero> heroes = new ArrayList();
         for (int i = 0; i < amount; i++) {
             ArrayList<Hero> subclasses = new ArrayList();
-            int r = random.nextInt(4);
+            int r = random.nextInt(5);
             switch (r) {
                 case 0:
                     heroes.add(new Tanker(randomNameGenerator(), board, new Point(random.nextInt(board.getWidth()), random.nextInt(board.getHeight()))));
@@ -62,6 +72,7 @@ board.getGameSquare(new Point(1,1)).addItem(hp);
                 case 3:
                     heroes.add(new Soldier(randomNameGenerator(), board, new Point(random.nextInt(board.getWidth()), random.nextInt(board.getHeight()))));
                     break;
+                case 4: heroes.add(new Speedy(randomNameGenerator(), board, new Point(random.nextInt(board.getWidth()), random.nextInt(board.getHeight()))));
                 default:
                     break;
             }

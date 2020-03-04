@@ -25,12 +25,15 @@ public class Hero extends BaseHero {
     boolean living = true;
     boolean inBattle = false;
 
-
+    boolean peace = false;
     boolean tome = false;
     int baseAr;
     int speed;
     //only applicable if in combat otherwise will be null
     Battle combat;
+
+    Hero enemy;
+
     public Hero(String name, GameBoard gameBoard, Point position) {
         super(gameBoard, position);
         this.speed = random.nextInt(8);
@@ -90,7 +93,7 @@ public class Hero extends BaseHero {
             if (!isInBattle()) {
                 if (getBoard().getGameSquare(getLocation()).hasItems()) {
                     pickUp(getBoard().getGameSquare(getLocation()).getItems().get(0));
-                       getBoard().getGameSquare(getLocation()).getItems().remove(0);
+                    getBoard().getGameSquare(getLocation()).getItems().remove(0);
                 } else {
                     move();
                 }
@@ -130,8 +133,7 @@ public class Hero extends BaseHero {
     }
 
     /**
-     * sets hero's location to randomly chosen adjacent
-     * on the new tile.
+     * sets hero's location to randomly chosen adjacent on the new tile.
      */
     public void move() {
         getBoard().getGameSquare(getLocation()).removeHero(this);
@@ -158,9 +160,11 @@ public class Hero extends BaseHero {
     public ArrayList<Hero> offsetCheck(int xOffset, int yOffset, ArrayList<Hero> enemys) {
         Hero camera;
         camera = checkSquare((int) getLocation().getX() + xOffset, (int) getLocation().getY() + yOffset);
-        if (!(camera == null) && !camera.inBattle) {
-            enemys.add(camera);
-            System.out.println(getName() + " has spotted an enemy");
+        if (!(camera == null)) {
+            if (!camera.isInBattle() || !hasPeace()) {
+                enemys.add(camera);
+                System.out.println(getName() + " has spotted an enemy");
+            }
         }
         return enemys;
     }
@@ -203,7 +207,8 @@ public class Hero extends BaseHero {
     public void pickUp(Item item) {
         if (inventory.size() < inventorySize) {
             inventory.add(item);
-            ((ItemStuff)item).pickUp();
+            ((ItemStuff) item).setOwner(this);
+            ((ItemStuff) item).pickUp();
 
         }
     }
@@ -241,8 +246,9 @@ public class Hero extends BaseHero {
      */
     @Override
     public String enemy() {
-
-        return null;
+        if (!(getEnemy() == null)) {
+            return getEnemy().getName();
+        }else return "no enemy";
     }
 
     //getters and setters
@@ -350,11 +356,28 @@ public class Hero extends BaseHero {
     public void setBaseAr(int baseAr) {
         this.baseAr = baseAr;
     }
-        public boolean haseTome() {
+
+    public boolean haseTome() {
         return tome;
     }
 
     public void setTome(boolean tome) {
         this.tome = tome;
+    }
+
+    public boolean hasPeace() {
+        return peace;
+    }
+
+    public void setPeace(boolean peace) {
+        this.peace = peace;
+    }
+
+    public Hero getEnemy() {
+        return enemy;
+    }
+
+    public void setEnemy(Hero enemy) {
+        this.enemy = enemy;
     }
 }

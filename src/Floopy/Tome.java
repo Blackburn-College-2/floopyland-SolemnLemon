@@ -15,6 +15,7 @@ public class Tome extends ItemStuff{
     }
     public void pickUp(){
     owner.setTome(true);
+    super.color="purple";
     }
     
     @Override

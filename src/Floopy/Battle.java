@@ -25,6 +25,8 @@ public class Battle {
         b.setInBattle(true);
         a.setCombat(this);
         b.setCombat(this);
+        a.setEnemy(b);
+        b.setEnemy(a);
     }
 
     public void fight() {
