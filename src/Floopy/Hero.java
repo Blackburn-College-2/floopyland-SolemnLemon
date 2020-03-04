@@ -8,7 +8,6 @@ package Floopy;
 import com.pauliankline.floopyconnector.BaseHero;
 import com.pauliankline.floopyconnector.GameBoard;
 import com.pauliankline.floopyconnector.Item;
-import java.awt.Color;
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Random;
@@ -23,22 +22,24 @@ public class Hero extends BaseHero {
     Random random = new Random();
     //an array so that it has a defined size 
     int inventorySize = 3;
-    ArrayList<Item> inventory;
     boolean living = true;
     boolean inBattle = false;
-    String name;
-    int baseAr;
 
+
+    boolean tome = false;
+    int baseAr;
+    int speed;
+    //only applicable if in combat otherwise will be null
+    Battle combat;
     public Hero(String name, GameBoard gameBoard, Point position) {
-        
         super(gameBoard, position);
-        System.out.println("test");
+        this.speed = random.nextInt(8);
         this.name = name;
-        baseAr = 10;
-        getBoard().getGameSquare(getLocation()).addHero(this);
-        
-        setHp(100);
-        super.color="red";
+        baseAr = 50;
+        getBoard().getGameSquare(position).addHero(this);
+
+        super.color = "red";
+
     }
 
     /**
@@ -67,9 +68,11 @@ public class Hero extends BaseHero {
      */
     @Override
     public void die() {
- 
-        this.location.setLocation(null);
+        getBoard().getGameSquare(getLocation()).getHeroesPresent().remove(this);
+        //this.location.setLocation(null);
         setLiving(false);
+        System.out.println(isInBattle());
+        getCombat().end(this);
 
     }
 
@@ -80,49 +83,99 @@ public class Hero extends BaseHero {
      */
     @Override
     public void gameTickAction(long gameTick) {
-        if (!isInBattle()) {
-            if (getBoard().getGameSquare(getLocation()).hasItems()) {
-                pickUp(getBoard().getGameSquare(getLocation()).getItems().get(0));
+        for (int i = 0; i < getInventory().size(); i++) {
+            ((ItemStuff) (getInventory().get(i))).tick();
+        }
+        if (getLiving()) {
+            if (!isInBattle()) {
+                if (getBoard().getGameSquare(getLocation()).hasItems()) {
+                    pickUp(getBoard().getGameSquare(getLocation()).getItems().get(0));
+                       getBoard().getGameSquare(getLocation()).getItems().remove(0);
+                } else {
+                    move();
+                }
+                ArrayList<Hero> nearby = scan();
+                if (!nearby.isEmpty()) {
+                    startCombat(nearby);
+                }
             } else {
-                move();
+                System.out.println(isInBattle());
+                combat.fight();
             }
+        }
 
+    }
+
+    public void startCombat(ArrayList<Hero> nearby) {
+        Hero activeHero = nearby.get(0);//viewer for ordering 
+        if (nearby.size() >= 1) {
+//more than one hero in range
+//looks through array list only updating active hero if it comes across a hero with higher health than the running max
+
+            int highestHp = 0;
+            for (int i = 0; i < nearby.size(); i++) {
+                if (nearby.get(i).getHp() > highestHp) {
+                    activeHero = nearby.get(i);
+                }
+            }
+        }
+        //checks speed first attacker is hero with higher speed
+
+        if (getSpeed() >= activeHero.getSpeed()) {
+            setCombat(new Battle(this, activeHero));
+        } else {
+            setCombat(new Battle(activeHero, this));
         }
 
     }
 
     /**
-     * sets hero's location to randomly chosen adjacent one also picks up 1 item
+     * sets hero's location to randomly chosen adjacent
      * on the new tile.
      */
     public void move() {
-
+        getBoard().getGameSquare(getLocation()).removeHero(this);
         location = chooseRandomDirection();
         getBoard().getGameSquare(getLocation()).addHero(this);
-//checks square for items then adds them if their are any
-        if (getBoard().getGameSquare(location).hasItems()) {
-            pickUp(getBoard().getGameSquare(getLocation()).getItems().get(0));
-            getBoard().getGameSquare(getLocation()).getItems().remove(0);
 
-        }
     }
 
     public ArrayList<Hero> scan() {
         //good lord this is going to be hellish
         ArrayList<Hero> enemys = new ArrayList();
+        enemys = offsetCheck(-1, 1, enemys);
+        enemys = offsetCheck(0, 1, enemys);
+        enemys = offsetCheck(1, 1, enemys);
+        enemys = offsetCheck(-1, 0, enemys);
+        enemys = offsetCheck(1, 0, enemys);
+        enemys = offsetCheck(-1, -1, enemys);
+        enemys = offsetCheck(0, -1, enemys);
+        enemys = offsetCheck(1, -1, enemys);
 
         return enemys;
     }
-/**
- * checks a square if it has an enemy in it and returns it
- * also manages wrapping
- * @param x x value of square
- * @param y value of square
- * @return hero in the square
- */
-    public BaseHero checkSquare(int x, int y) {
+
+    public ArrayList<Hero> offsetCheck(int xOffset, int yOffset, ArrayList<Hero> enemys) {
+        Hero camera;
+        camera = checkSquare((int) getLocation().getX() + xOffset, (int) getLocation().getY() + yOffset);
+        if (!(camera == null) && !camera.inBattle) {
+            enemys.add(camera);
+            System.out.println(getName() + " has spotted an enemy");
+        }
+        return enemys;
+    }
+
+    /**
+     * checks a square if it has an enemy in it and returns it also manages
+     * wrapping
+     *
+     * @param x x value of square
+     * @param y value of square
+     * @return hero in the square
+     */
+    public Hero checkSquare(int x, int y) {
         if (getBoard().getGameSquare(new Point(xWrap(x), yWrap(y))).heroesArePresent()) {
-            return getBoard().getGameSquare(new Point(xWrap(x), yWrap(y))).getHeroesPresent().get(0);
+            return (Hero) getBoard().getGameSquare(new Point(xWrap(x), yWrap(y))).getHeroesPresent().get(0);
         }
         return null;
     }
@@ -150,6 +203,7 @@ public class Hero extends BaseHero {
     public void pickUp(Item item) {
         if (inventory.size() < inventorySize) {
             inventory.add(item);
+            ((ItemStuff)item).pickUp();
 
         }
     }
@@ -169,19 +223,14 @@ public class Hero extends BaseHero {
         direction[3] = new Point((int) getLocation().getX(), (int) getLocation().getY() - 1);
 
         Point newSquare = direction[random.nextInt(4)];
-        if (newSquare.getX() > getBoard().getWidth()) {
-            newSquare = new Point(0, (int) newSquare.getY());
-        }
-        if (newSquare.getX() < 0) {
-            newSquare = new Point(getBoard().getWidth(), (int) newSquare.getY());
-        }
-        if (newSquare.getY() > getBoard().getHeight()) {
-            newSquare = new Point((int) newSquare.getX(), 0);
-        }
-        if (newSquare.getY() < 0) {
-            newSquare = new Point((int) newSquare.getX(), (int) getBoard().getHeight());
+        newSquare = new Point(xWrap((int) newSquare.getX()), yWrap((int) newSquare.getY()));
+        //checks if a hero is at the new point then re does the random if there is
+        // I realize this is ridiculously inefficient but it works
+        if (getBoard().getGameSquare(newSquare).heroesArePresent()) {
+            newSquare = chooseRandomDirection();
         }
         return newSquare;
+
     }
 
     /**
@@ -192,7 +241,7 @@ public class Hero extends BaseHero {
      */
     @Override
     public String enemy() {
-       
+
         return null;
     }
 
@@ -220,7 +269,7 @@ public class Hero extends BaseHero {
      * applied
      */
     public int attack() {
-        return baseAr + random.nextInt(10);
+        return baseAr + random.nextInt(100);
     }
 
     /**
@@ -238,6 +287,9 @@ public class Hero extends BaseHero {
 
     public void takeDamage(int incomingDamage) {
         setHp(getHp() - incomingDamage);
+        if (getHp() <= 0) {
+            die();
+        }
     }
 
     /**
@@ -249,6 +301,7 @@ public class Hero extends BaseHero {
     public int confirmAttack(int damageDone) {
         return damageDone;
     }
+//getters and setters
 
     public int getHp() {
         return this.hp;
@@ -259,6 +312,49 @@ public class Hero extends BaseHero {
     }
 
     public String getName() {
-        return name;
+        return this.name;
+    }
+
+    public int setInventorySize(int i) {
+        return this.inventorySize = i;
+    }
+
+    public int getSpeed() {
+        return speed;
+    }
+
+    public void setSpeed(int speed) {
+        this.speed = speed;
+    }
+
+    public void setCombat(Battle combat) {
+        this.combat = combat;
+    }
+
+    public Battle getCombat() {
+        return combat;
+    }
+
+    public ArrayList<Item> getInventory() {
+        return this.inventory;
+    }
+
+    public boolean getLiving() {
+        return living;
+    }
+
+    public int getBaseAr() {
+        return baseAr;
+    }
+
+    public void setBaseAr(int baseAr) {
+        this.baseAr = baseAr;
+    }
+        public boolean haseTome() {
+        return tome;
+    }
+
+    public void setTome(boolean tome) {
+        this.tome = tome;
     }
 }
