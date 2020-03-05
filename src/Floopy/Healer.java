@@ -16,7 +16,8 @@ public class Healer extends Hero {
 
     public Healer(String name, GameBoard gameBoard, Point position) {
         super(name, gameBoard, position);
-super.color="green";
+        super.color = "green";
+        super.type = "Healer";
     }
 
     @Override

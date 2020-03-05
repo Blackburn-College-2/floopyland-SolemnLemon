@@ -17,6 +17,7 @@ public class Ninja extends Hero {
     public Ninja(String name, GameBoard gameBoard, Point position) {
         super(name, gameBoard, position);
 super.color="white";
+super.type="Ninja";
     }
     
       public int defend(int incomingDamage) {

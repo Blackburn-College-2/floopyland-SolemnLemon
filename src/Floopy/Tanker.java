@@ -17,6 +17,7 @@ public class Tanker extends Hero{
     super(name,gameBoard,position);
     setHp(1400);
     super.color="black";
+    super.type="Tank";
     }
     
 }

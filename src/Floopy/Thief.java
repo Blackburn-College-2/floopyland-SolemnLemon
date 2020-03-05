@@ -17,6 +17,7 @@ public class Thief extends Hero {
     public Thief(String name, GameBoard gameBoard, Point position) {
         super(name, gameBoard, position);
         super.color = "grey";
+        super.type="thief";
     }
 
     @Override

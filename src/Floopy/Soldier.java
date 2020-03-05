@@ -18,6 +18,6 @@ public class Soldier extends Hero{
         super(name, gameBoard, position);
         setInventorySize(4);
         super.color="red";
-
+super.type="Soldier";
     }
 }

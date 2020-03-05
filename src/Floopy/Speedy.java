@@ -19,6 +19,7 @@ public class Speedy extends Hero{
         //speed is high enough that they will always go first
         super.setSpeed(100);
         super.color="blue";
+        super.type="Speedy";
 
     }
     

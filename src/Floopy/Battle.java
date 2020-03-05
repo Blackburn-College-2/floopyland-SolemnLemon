@@ -17,8 +17,14 @@ public class Battle {
     Hero a;
     Hero b;
 
+    /**
+     * creates a new Battle between a passed in hero a and hero b
+     *
+     * @param a hero that attacks first
+     * @param b hero that defends first
+     */
     public Battle(Hero a, Hero b) {
-        System.out.println("combatStarted");
+        System.out.println(a.getName() + " started a fight with " + b.getName());
         this.a = a;
         this.b = b;
         a.setInBattle(true);
@@ -29,6 +35,11 @@ public class Battle {
         b.setEnemy(a);
     }
 
+    /**
+     * runs one fight between the the attacker and defender of hero then
+     * switches them for the next call
+     *
+     */
     public void fight() {
         if (b.haseTome()) {
             int damageToBeDone = (int) 0.9 * a.attack();
@@ -38,13 +49,17 @@ public class Battle {
         } else {
             int damageToBeDone = a.attack();
             int damageDone = a.confirmAttack(b.defend(damageToBeDone));
-            System.out.println(a.getName() + " did " + damageDone + " to " + b.getName());
+            System.out.println(a.getName() + " did " + damageDone + " damage to " + b.getName());
         }
-
-        
         swap();
     }
 
+    /**
+     * sets all combat related things to null and false and prints a message of
+     * the winner/loser
+     *
+     * @param loser the loser of the fight
+     */
     public void end(Hero loser) {
         System.out.println("combat between " + a.getName() + " and " + b.getName() + "has ended " + loser.getName() + " has died");
         a.setCombat(null);
@@ -54,6 +69,9 @@ public class Battle {
 
     }
 
+    /**
+     * swaps heroes a and b
+     */
     public void swap() {
         Hero c = a;
         a = b;
