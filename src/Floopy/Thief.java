@@ -19,16 +19,20 @@ public class Thief extends Hero {
         super.color = "grey";
         super.type="thief";
     }
-
-    @Override
+/**
+ * unique attack for thieves that has 50% chance to steal a random item from the enemy
+ * and use it instead of attacking
+ * @return 
+ */
+     @Override
     public int attack() {
-        if (random.nextBoolean()) {
-            return baseAr + random.nextInt(100);
-        }
-        if (!(getEnemy().getInventory().get(0) == null)) {
-            ((ItemStuff)getEnemy().getInventory().get(0)).setOwner(this);
-            ((ItemStuff)getEnemy().getInventory().get(0)).use();
-        }
-        return 0;
+    if (random.nextBoolean()) {
+    return baseAr + random.nextInt(100);
+    }
+    if (!(getEnemy().getInventory().isEmpty())) {
+    ((ItemStuff)getEnemy().getInventory().get(0)).setOwner(this);
+    ((ItemStuff)getEnemy().getInventory().get(0)).use();
+    }
+    return 0;
     }
 }

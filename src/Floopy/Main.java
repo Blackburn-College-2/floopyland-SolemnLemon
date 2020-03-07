@@ -20,7 +20,7 @@ public class Main {
         // TODO code application logic here
         Floopy floop = new Floopy(new Game());
 
-        floop.begin(4);
+        floop.begin(10);
 
     }
 

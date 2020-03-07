@@ -74,14 +74,44 @@ public class Hero extends BaseHero {
         getBoard().getGameSquare(getLocation()).getHeroesPresent().remove(this);
         //this.location.setLocation(null);
         setLiving(false);
-        System.out.println(isInBattle());
+
         getCombat().end(this);
 
+    }
+/**
+ * uses a health potion if low health or strength potion if has one
+ * @return if an item was used during the call
+ */
+    public boolean useItem() {
+        System.out.println("using an item");
+        for (int i = 0; i < getInventory().size(); i++) {
+            if (getInventory().get(i) instanceof Vulneray) {
+                if (getHp() < 1000) {
+                    ((ItemStuff) getInventory().get(i)).use();
+                    System.out.println(getName() + " used a health potion.");
+                    return true;
+                }
+            }
+            if (getInventory().get(i) instanceof StrengthPotion) {
+                ((ItemStuff) getInventory().get(i)).use();
+                System.out.println(getName() + "used a Strength Potion");
+                return true;
+            }
+        }
+        System.out.println("failed to used an item ");
+        return false;
     }
 
     /**
      * chooses what the hero does on the given tick
-     *
+     *ticks items with counters
+     * A hero can only do one thing per tick using this list of priorities
+     * if the higher one cannot be done go one lower
+     * fight
+     * uses and item if possible 
+     * picks up an item if possible
+     * move
+     * will always detects surroundings and starts fight if anyone is close
      * @param gameTick current tick being acted on
      */
     @Override
@@ -91,11 +121,14 @@ public class Hero extends BaseHero {
         }
         if (getLiving()) {
             if (!isInBattle()) {
-                if (getBoard().getGameSquare(getLocation()).hasItems()) {
-                    pickUp(getBoard().getGameSquare(getLocation()).getItems().get(0));
-                    getBoard().getGameSquare(getLocation()).getItems().remove(0);
-                } else {
-                    move();
+                //uses and item if can if not pick up item on tile if can't moves
+                if (!useItem()) {
+                    if (getBoard().getGameSquare(getLocation()).hasItems()) {
+                        pickUp(getBoard().getGameSquare(getLocation()).getItems().get(0));
+                        getBoard().getGameSquare(getLocation()).getItems().remove(0);
+                    } else {
+                        move();
+                    }
                 }
                 ArrayList<Hero> nearby = scan();
                 if (!nearby.isEmpty()) {
@@ -108,9 +141,18 @@ public class Hero extends BaseHero {
         }
 
     }
-
+/**
+ * starts combat with the nearby hero with the highest health
+ * hero with higher speed will attack first
+ * @param nearby nearby heroes
+ */
     public void startCombat(ArrayList<Hero> nearby) {
+
         Hero activeHero = nearby.get(0);//viewer for ordering 
+        if (activeHero.isInBattle()) {
+            System.out.println(getName() + " spotted " + activeHero.getName() + " but " + activeHero.getName() + " was already in a fight");
+        }else{
+
         if (nearby.size() >= 1) {
 //more than one hero in range
 //looks through array list only updating active hero if it comes across a hero with higher health than the running max
@@ -129,7 +171,7 @@ public class Hero extends BaseHero {
         } else {
             setCombat(new Battle(activeHero, this));
         }
-
+        }
     }
 
     /**
@@ -141,7 +183,10 @@ public class Hero extends BaseHero {
         getBoard().getGameSquare(getLocation()).addHero(this);
 
     }
-
+/**
+ * looks around hero for enemies
+ * @return 
+ */
     public ArrayList<Hero> scan() {
         //good lord this is going to be hellish
         ArrayList<Hero> enemys = new ArrayList();
@@ -156,12 +201,19 @@ public class Hero extends BaseHero {
 
         return enemys;
     }
-
-    public ArrayList<Hero> offsetCheck(int xOffset, int yOffset, ArrayList<Hero> enemys) {
+/**
+ * only to be called by scan
+ * checks a given point if it has an enemy
+ * @param xOffset
+ * @param yOffset
+ * @param enemys
+ * @return 
+ */
+    private ArrayList<Hero> offsetCheck(int xOffset, int yOffset, ArrayList<Hero> enemys) {
         Hero camera;
         camera = checkSquare((int) getLocation().getX() + xOffset, (int) getLocation().getY() + yOffset);
         if (!(camera == null)) {
-            if (!camera.isInBattle() || !hasPeace()) {
+            if (!(camera.isInBattle()) || !hasPeace()) {
                 enemys.add(camera);
                 System.out.println(getName() + " has spotted an enemy");
             }
@@ -183,14 +235,22 @@ public class Hero extends BaseHero {
         }
         return null;
     }
-
+/**
+ * calculates wrapping for y value
+ * @param y
+ * @return 
+ */
     public int yWrap(int y) {
         if (y < 0) {
             y = getBoard().getHeight() - 1;
         }
         return y % getBoard().getHeight();
     }
-
+/**
+ * calculates wrapping for x value
+ * @param x
+ * @return 
+ */
     public int xWrap(int x) {
         if (x < 0) {
             x = getBoard().getHeight() - 1;
@@ -201,15 +261,17 @@ public class Hero extends BaseHero {
     /**
      * checks if inventory has space for an item and if it does it adds it to
      * it.
-     *
      * @param item
      */
     public void pickUp(Item item) {
         if (inventory.size() < inventorySize) {
+            System.out.println(getName() + " picked up a" + item.getClass());
             inventory.add(item);
             ((ItemStuff) item).setOwner(this);
             ((ItemStuff) item).pickUp();
 
+        } else {
+            System.out.println(getName() + " tried to pick up a " + item.getClass() + " but was out of inventory space");
         }
     }
 
@@ -248,7 +310,9 @@ public class Hero extends BaseHero {
     public String enemy() {
         if (!(getEnemy() == null)) {
             return getEnemy().getName();
-        }else return "no enemy";
+        } else {
+            return "no enemy";
+        }
     }
 
     //getters and setters

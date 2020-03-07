@@ -19,7 +19,12 @@ public class Ninja extends Hero {
 super.color="white";
 super.type="Ninja";
     }
-    
+    /**
+     * unique defend for ninjas that only takes 75% damage
+     * 
+     * @param incomingDamage
+     * @return 
+     */
       public int defend(int incomingDamage) {
         takeDamage((int)Math.round(incomingDamage*.75));
         return incomingDamage;

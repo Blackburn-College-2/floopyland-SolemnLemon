@@ -21,11 +21,20 @@ public class PeaceTreaty extends ItemStuff{
     public void use() {
         
         }
+    
+    /**
+     * unique pickup for peace treaty that sets the Boolean Peace in hero to true
+     */
+    /*  @Override
     public void pickUp(){
     countDown=15;
     owner.setPeace(true);
-    }
-      @Override
+    owner.getBoard().getGameSquare(owner.getLocation()).getItems().remove(this);
+    }*/
+    /**
+     * counts down on each tick then removes from inventory
+     */ 
+    @Override
     public void tick(){
     countDown--;
     if(countDown==0){

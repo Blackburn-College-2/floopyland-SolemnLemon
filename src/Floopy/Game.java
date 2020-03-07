@@ -58,7 +58,7 @@ gboard.getGameSquare(new Point(((int)(Math.random()*gboard.getWidth())), (((int)
         ArrayList<BaseHero> heroes = new ArrayList();
         for (int i = 0; i < amount; i++) {
             ArrayList<Hero> subclasses = new ArrayList();
-            int r = random.nextInt(5);
+            int r = random.nextInt(6);
             switch (r) {
                 case 0:
                     heroes.add(new Tanker(randomNameGenerator(), board, new Point(random.nextInt(board.getWidth()), random.nextInt(board.getHeight()))));
@@ -73,6 +73,8 @@ gboard.getGameSquare(new Point(((int)(Math.random()*gboard.getWidth())), (((int)
                     heroes.add(new Soldier(randomNameGenerator(), board, new Point(random.nextInt(board.getWidth()), random.nextInt(board.getHeight()))));
                     break;
                 case 4: heroes.add(new Speedy(randomNameGenerator(), board, new Point(random.nextInt(board.getWidth()), random.nextInt(board.getHeight()))));
+                break;
+                case 5:heroes.add(new Thief(randomNameGenerator(), board, new Point(random.nextInt(board.getWidth()), random.nextInt(board.getHeight()))));
                 default:
                     break;
             }
@@ -83,7 +85,6 @@ gboard.getGameSquare(new Point(((int)(Math.random()*gboard.getWidth())), (((int)
 
     /**
      * generates a random name for each hero
-     *
      * @return
      */
     public String randomNameGenerator() {
